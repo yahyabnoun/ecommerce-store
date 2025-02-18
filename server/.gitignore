@@ -1,0 +1,18 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__
+.pytest_cache
+*.db
+*.sqlite3
+*.log
+
+# VSCode
+.vscode/
+
+# Other files
+*.sqlite
+*.sqlite-journal
+*.pot
+*.mo
