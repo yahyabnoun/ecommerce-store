@@ -8,139 +8,122 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, User, Menu, X, Heart } from 'lucide-react';
+import { ShoppingCart, User, Heart, Search, X } from 'lucide-react';
 
-const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+interface NavbarProps {
+  onAuthButtonClick: () => void;
+}
+
+const Navbar = ({ onAuthButtonClick }: NavbarProps) => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [elementsInCart] = useState(2);
   const [elementsInWishlist] = useState(0);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
+
+  const navVariants = {
+    hidden: { y: -100, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: 'easeOut' } }
+  };
+
+  const searchVariants = {
+    hidden: { width: 0, opacity: 0 },
+    visible: { 
+      width: '200px', 
+      opacity: 1, 
+      transition: { duration: 0.3, ease: 'easeInOut' }
+    }
+  };
 
   return (
     <motion.nav
       className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      variants={navVariants}
+      initial="hidden"
+      animate="visible"
     >
-      <div className="flex h-14 w-[100vw] items-center justify-between px-[2vw] ">
-        <NavigationMenu className="hidden md:flex justify-start">
-          <NavigationMenuList className="gap-6">
-            <NavigationMenuItem>
-              <NavigationMenuLink href="#" className="text-sm font-medium hover:text-primary">
-                Men
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href="#" className="text-sm font-medium hover:text-primary">
-                Women
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href="#" className="text-sm font-medium hover:text-primary">
-                Kids
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-
-        <div className="md:hidden flex justify-start">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleMenu}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+      <div className="flex h-[8vh] w-full items-center justify-between px-4 lg:px-6 relative">
+        {/* Left Section */}
+        <div className="flex items-center gap-4">
+          <NavigationMenu>
+            <NavigationMenuList className="gap-6">
+              {['Men', 'Women', 'Kids'].map((item) => (
+                <NavigationMenuItem key={item}>
+                  <NavigationMenuLink
+                    href="#"
+                    className="text-sm font-medium text-gray-800 hover:text-lime-500 transition-colors duration-200"
+                  >
+                    {item}
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
 
-
-        <div className="absolute w-[8%] ml-[44vw] mr-[44vw] h-14 flex items-center justify-center">
-          <span className="text-xl font-bold ibrand">
-            <span className="text-primary" style={{ letterSpacing: '1px' }}>Sneakers</span>
-            <span className="text-gray-500" style={{ marginLeft: '2px' }}>X</span>
+        {/* Center Logo - Absolute Positioned */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <span className="text-xl font-bold tracking-tight">
+            <span className="text-gray-900">Sneakers</span>
+            <span className="text-lime-500">X</span>
           </span>
         </div>
 
-        <div className="flex justify-end items-center gap-4">
-          <Button variant="ghost" size="icon" className="relative">
+        {/* Right Section */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <AnimatePresence>
+              {isSearchOpen && (
+                <motion.input
+                  variants={searchVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  type="text"
+                  placeholder="Search products..."
+                  className="h-8 px-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-lime-500"
+                />
+              )}
+            </AnimatePresence>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="relative hover:bg-lime-50"
+              onClick={toggleSearch}
+            >
+              {isSearchOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Search className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
+          
+          <Button variant="ghost" size="icon" className="relative hover:bg-lime-50">
             <Heart className="h-5 w-5" />
             {elementsInWishlist > 0 && (
-              <Badge className="absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full">
+              <Badge className="absolute -right-1 -top-1 h-4 w-4 flex items-center justify-center rounded-full bg-lime-500 text-white text-xs">
                 {elementsInWishlist}
               </Badge>
             )}
           </Button>
-
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative hover:bg-lime-50">
             <ShoppingCart className="h-5 w-5" />
             {elementsInCart > 0 && (
-              <Badge className="absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full">
+              <Badge className="absolute -right-1 -top-1 h-4 w-4 flex items-center justify-center rounded-full bg-lime-500 text-white text-xs">
                 {elementsInCart}
               </Badge>
             )}
           </Button>
-
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onAuthButtonClick}
+            className="hover:bg-lime-50"
+          >
             <User className="h-5 w-5" />
           </Button>
         </div>
-
-        <AnimatePresence>
-          {isMenuOpen && (
-            <>
-              <motion.div
-                className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                onClick={toggleMenu}
-              />
-              <motion.div
-                className="fixed left-0 top-0 h-screen w-3/4 max-w-sm bg-background z-50 shadow-lg"
-                initial={{ x: '-100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '-100%' }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-              >
-                <div className="flex h-14 items-center justify-between px-4 border-b">
-                  <span className="text-xl font-bold ibrand">
-                    <span className="text-primary" style={{ letterSpacing: '1px' }}>Sneakers</span>
-                    <span className="text-gray-500" style={{ marginLeft: '2px' }}>X</span>
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleMenu}
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-                <div className="flex flex-col space-y-2 p-4">
-                  {['Men', 'Women', 'Kids'].map((item, index) => (
-                    <motion.div
-                      key={item}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ delay: index * 0.1, duration: 0.2 }}
-                    >
-                      <Button
-                        variant="ghost"
-                        className="justify-start text-lg w-full"
-                        asChild
-                      >
-                        <a href="#">{item}</a>
-                      </Button>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
       </div>
     </motion.nav>
   );

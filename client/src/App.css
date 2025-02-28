@@ -8,3 +8,19 @@
   font-family: "ibrand";
   font-weight:400;
 }
+
+
+
+.lines {
+  position: relative;
+  isolation: isolate;
+}
+
+.lines svg {
+  mix-blend-mode: multiply;
+  filter: contrast(1.2);
+}
+
+.lines path {
+  vector-effect: non-scaling-stroke;
+}
