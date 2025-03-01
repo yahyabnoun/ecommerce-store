@@ -71,18 +71,18 @@ const heroVariants = {
 };
 
 const leftSectionVariants = {
-    initial: { y: -50 },
-    animate: { y: 0, transition: { duration: 0.5, ease: "easeOut", delay: 0.2 } }
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 0.5, ease: "easeOut", delay: 0.2 } }
 };
 
 const middleSectionVariants = {
-    initial: { y: -50 },
-    animate: { y: 0, transition: { duration: 0.5, ease: "easeOut", delay: 0.4 } }
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 0.5, ease: "easeOut", delay: 0.4 } }
 };
 
 const rightSectionVariants = {
-    initial: { y: -50 },
-    animate: { y: 0, transition: { duration: 0.5, ease: "easeOut", delay: 0.6 } }
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 0.5, ease: "easeOut", delay: 0.6 } }
 };
 
 const sneakers = [
@@ -165,7 +165,7 @@ function HeroSection() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 2000);
+        }, 1000);
 
         const interval = setInterval(() => {
             setSelectedIndex((prev) => (prev + 1) % sneakers.length);
