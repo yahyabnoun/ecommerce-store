@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
-
-
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, **extra_fields):
         if not email:
@@ -34,19 +32,21 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self._create_user(email, password,  **extra_fields)
-    
+
 
 class User(AbstractBaseUser, PermissionsMixin):
-    ROLE_CHOICES = (
+    ROLE_CHOICES = [
         ('admin', 'Admin'),
-        ('customer', 'Customer'),
-    )
+        ('customer', 'Customer')
+    ]
+        
 
-
-    email = models.EmailField(unique=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
-    phone = models.CharField(max_length=15, unique=True, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
+    email = models.EmailField(db_index=True, unique=True, max_length=254)
+    first_name = models.CharField(max_length=150, blank=True, null=True)
+    last_name = models.CharField(max_length=150, blank=True, null=True)
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='customer')
+    gender = models.CharField(max_length=50, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)  
 
     is_staff = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
@@ -59,7 +59,3 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-        
-        
-    def __str__(self):
-        return f"{self.email} ({self.role})"
