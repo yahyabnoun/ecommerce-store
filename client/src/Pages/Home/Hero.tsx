@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import sneakerImage1 from '@/assets/imgs/hero1.jpg';
-import sneakerImage2 from '@/assets/imgs/hero2.jpg';
-import sneakerImage3 from '@/assets/imgs/hero3.jpg';
+import sneakerImage1 from '/imgs/hero1.jpg';
+import sneakerImage2 from '/imgs/hero2.jpg';
+import sneakerImage3 from '/imgs/hero3.jpg';
 import Loader from '@/components/ui/Loader';
 
 const sneakerImages = [sneakerImage1, sneakerImage2, sneakerImage3];

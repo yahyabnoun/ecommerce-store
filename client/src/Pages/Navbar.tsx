@@ -43,7 +43,6 @@ const Navbar = ({ onAuthButtonClick }: NavbarProps) => {
       animate="visible"
     >
       <div className="flex h-[8vh] w-full items-center justify-between px-4 lg:px-6 relative">
-        {/* Left Section */}
         <div className="flex items-center gap-4">
           <NavigationMenu>
             <NavigationMenuList className="gap-6">
@@ -61,7 +60,6 @@ const Navbar = ({ onAuthButtonClick }: NavbarProps) => {
           </NavigationMenu>
         </div>
 
-        {/* Center Logo - Absolute Positioned */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <span className="text-xl font-bold tracking-tight">
             <span className="text-gray-900">Sneakers</span>
@@ -69,7 +67,6 @@ const Navbar = ({ onAuthButtonClick }: NavbarProps) => {
           </span>
         </div>
 
-        {/* Right Section */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             <AnimatePresence>

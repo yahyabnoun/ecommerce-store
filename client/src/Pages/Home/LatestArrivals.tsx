@@ -97,7 +97,7 @@ export default function LatestArrivals() {
 
     return (
         <motion.section
-            className="w-[100vw] px-[2.5vw] bg-gray-50 py-[15vh] relative"
+            className="w-[100vw] px-[2.5vw] bg-gray-50 py-[10vh] relative"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -134,12 +134,12 @@ export default function LatestArrivals() {
                 ref={scrollRef}
                 className="flex flex-row overflow-x-auto scrollbar-hide snap-x snap-mandatory"
             >
-                {sneakers.map((sneaker, index) => (
+                {sneakers.map((sneaker) => (
                     <motion.div
                         key={sneaker.id}
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2, delay: index * 0.15, ease: "easeOut" }}
+                        transition={{ duration: 0.2, delay: 0.3, ease: "easeOut" }}
                         viewport={{ once: true }}
                         className="flex-shrink-0 px-[1vw] snap-center"
                     >
