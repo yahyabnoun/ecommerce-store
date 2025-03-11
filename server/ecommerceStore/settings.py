@@ -68,6 +68,7 @@ INSTALLED_APPS = [
 
     "main",
     'userauths',
+    "products",
 ]
 
 MIDDLEWARE = [
