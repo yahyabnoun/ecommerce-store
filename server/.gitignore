@@ -9,7 +9,6 @@ __pycache__
 *.log
 .venv/
 .idea/
-.env
 
 # VSCode
 .vscode/
