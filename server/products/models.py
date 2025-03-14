@@ -19,5 +19,22 @@ class SecondaryImage(models.Model):
 class ProductSize(models.Model):
     product = models.ForeignKey(Product, related_name="sizes", on_delete=models.CASCADE)
     size = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
     items_left = models.PositiveIntegerField(default=0)
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
+    def calculate_discount_percentage(self):
+
+        if self.original_price and self.original_price > self.price:
+            return round(((self.original_price - self.price) / self.original_price) * 100, 2)
+        return 0
+
+    def save(self, *args, **kwargs):
+
+        self.percentage = self.calculate_discount_percentage()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.product.name} - Size {self.size} - Price: {self.price} (Original: {self.original_price}) - Discount: {self.percentage}%"
+
