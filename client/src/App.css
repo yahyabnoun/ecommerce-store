@@ -1,0 +1,36 @@
+@font-face {
+  font-family: "ibrand";
+  src: url("./assets/font/ibrand.otf") format("truetype");
+  font-style: normal;
+}
+
+.ibrand{
+  font-family: "ibrand";
+  font-weight:400;
+}
+
+
+
+.lines {
+  position: relative;
+  isolation: isolate;
+}
+
+.lines svg {
+  mix-blend-mode: multiply;
+  filter: contrast(1.2);
+}
+
+.lines path {
+  vector-effect: non-scaling-stroke;
+}
+
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
+
