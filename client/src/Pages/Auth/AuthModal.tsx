@@ -2,31 +2,115 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { X } from 'lucide-react'; // Import X icon from lucide-react
+import { z } from 'zod';
+import { useAuth } from '@/context/AuthContext';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { obtainTokens, registerUser } from '@/api/Auth';
+import { showToast } from '@/components/ShowToast';
+import { AxiosError } from 'axios';
+import { Form } from '@/components/ui/form';
+import CustomInputField from '@/components/ui/form-fields/text-form-input-field';
+import PasswordInputWithLabelField from '@/components/password-inputs';
+import { DevTool } from "@hookform/devtools";
+
 
 interface AuthModalProps {
   show: boolean;
   onClose: () => void;
 }
 
+const loginValidator = z.object({
+  username: z.string().min(1, { message: 'Username is required' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters long' }),
+});
+
+const registerValidator = z.object({
+  email: z.string().email({ message: 'Invalid email address' }),
+  username: z.string().min(1, { message: 'Username is required' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters long' }),
+  confirmPassword: z.string().min(1, { message: 'Confirm Password is required' }),
+  first_name: z.string().min(1, { message: 'First Name is required' }),
+  last_name: z.string().min(1, { message: 'Last Name is required' }),
+}).refine(
+  (data) => data.password === data.confirmPassword,
+  {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  }
+);
+
+type LoginValues = z.infer<typeof loginValidator>;
+type RegisterValues = z.infer<typeof registerValidator>;
+
 const AuthModal = ({ show, onClose }: AuthModalProps) => {
   const [isSignIn, setIsSignIn] = useState(true);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ''
+  const { afterSuccessfullLogin } = useAuth();
+
+  const loginForm = useForm<LoginValues>({
+    resolver: zodResolver(loginValidator),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const registerForm = useForm<RegisterValues>({
+    resolver: zodResolver(registerValidator),
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+      first_name: '',
+      last_name: '',
+    },
+  });
+
+  const loginMutation = useMutation({
+    mutationKey: ["login-user"],
+    mutationFn: obtainTokens,
+    onSuccess: (response) => {
+      const data = response.data;
+      afterSuccessfullLogin(data.tokens, data.user);
+      showToast("success", "Login successful");
+      onClose();
+    },
+    onError: (error) => {
+      if (!(error instanceof AxiosError)) {
+        showToast("error", "Something went wrong");
+        return;
+      }
+      showToast("error", "Invalid credentials. Please try again");
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationKey: ["register-user"],
+    mutationFn: registerUser,
+    onSuccess: (response) => {
+      const data = response.data;
+      afterSuccessfullLogin(data.tokens, data.user);
+      showToast("success", "Registration successful");
+      onClose();
+    },
+    onError: (error) => {
+      if (!(error instanceof AxiosError)) {
+        showToast("error", "Something went wrong");
+        return;
+      }
+      const errorMessage = error?.response?.data?.detail || "Registration failed";
+      showToast("error", errorMessage);
+    },
+  });
+
+  const handleLoginSubmit = (data: LoginValues) => {
+    loginMutation.mutate(data);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log(formData);
+  const handleRegisterSubmit = (data: RegisterValues) => {
+    registerMutation.mutate(data);
   };
 
   return (
@@ -80,46 +164,75 @@ const AuthModal = ({ show, onClose }: AuthModalProps) => {
                 </Button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {!isSignIn && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      className="w-full px-4 py-2 border rounded-lg"
-                      onChange={handleInputChange}
-                      required={!isSignIn}
+              {isSignIn ? (
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-4">
+                    <CustomInputField
+                      fieldName="username"
+                      label="Username or Email"
+                      control={loginForm.control}
                     />
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    className="w-full px-4 py-2 border rounded-lg"
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    className="w-full px-4 py-2 border rounded-lg"
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <Button type="submit" className="w-full mt-4 py-5 ">
-                  {isSignIn ? 'Sign In' : 'Sign Up'}
-                </Button>
-              </form>
+                    <PasswordInputWithLabelField
+                      labelNode={<span>Password</span>}
+                      control={loginForm.control}
+                      fieldName="password"
+                      label="Password"
+                    />
+                    <Button 
+                      type="submit" 
+                      className="w-full mt-4" 
+                      disabled={loginMutation.isPending}
+                    >
+                      {loginMutation.isPending ? "Loading..." : "Sign In"}
+                    </Button>
+                  </form>
+                </Form>
+              ) : (
+                <Form {...registerForm}>
+                  <form onSubmit={registerForm.handleSubmit(handleRegisterSubmit)} className="space-y-4">
+                    <CustomInputField
+                      fieldName="username"
+                      label="Username"
+                      control={registerForm.control}
+                    />
+                    <CustomInputField
+                      fieldName="email"
+                      label="Email"
+                      control={registerForm.control}
+                    />
+                    <PasswordInputWithLabelField
+                      labelNode={<span>Password</span>}
+                      control={registerForm.control}
+                      fieldName="password"
+                      label="Password"
+                    />
+                    <PasswordInputWithLabelField
+                      labelNode={<span>Confirm Password</span>}
+                      control={registerForm.control}
+                      fieldName="confirmPassword"
+                      label="Confirm Password"
+                    />
+                    <CustomInputField
+                      fieldName="first_name"
+                      label="First Name"
+                      control={registerForm.control}
+                    />
+                    <CustomInputField
+                      fieldName="last_name"
+                      label="Last Name"
+                      control={registerForm.control}
+                    />
+                    <DevTool control={registerForm.control}/>
+                    <Button 
+                      type="submit" 
+                      className="w-full mt-4" 
+                      disabled={registerMutation.isPending}
+                    >
+                      {registerMutation.isPending ? "Loading..." : "Sign Up"}
+                    </Button>
+                  </form>
+                </Form>
+              )}
             </div>
           </motion.div>
         </>
